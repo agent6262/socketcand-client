@@ -2,7 +2,7 @@
   "name": "@agent6262/socketcand-client",
   "version": "2.0.0",
   "description": "An updated nodejs client for socketcand daemon.",
-  "main": "src/socketcand.ts",
+  "main": "build/socketcand.js",
   "scripts": {
     "test": "jest",
     "start:dev": "npx nodemon",
