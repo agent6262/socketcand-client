@@ -19,7 +19,7 @@
   ],
   "author": "Dennis Delin",
   "contributors": ["Tyler Bucher"],
-  "license": "MIT",
+  "license": "ISC",
   "bugs": {
     "url": "https://github.com/agent6262/socketcand-client/issues"
   },
