@@ -1,4 +1,4 @@
-const scd = require("../socketcand");
+const scd = require("../index");
 import {CustomSocket} from "./CustomSocket";
 import {Mode} from "../types/Mode";
 import nanoid from "nanoid";

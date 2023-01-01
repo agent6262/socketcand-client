@@ -8,6 +8,8 @@ import {EventEmitter} from "events";
 import {parseString} from "xml2js";
 import {isotpConfig, sendPdu} from "./util/ISOTP";
 import {addFrame, deleteFrame, filter, sendFrame, subscribe, unsubscribe, updateFrame} from "./util/BCM";
+import {ConnectionMode} from "./types/ConnectionMode";
+import {CustomSocket} from "./models/CustomSocket";
 
 const emitter = new EventEmitter();
 
@@ -34,7 +36,7 @@ baseSocket.on('error', (err: Error) => {
     return new Error("Server error:\n${err.stack}");
 });
 baseSocket.on('message', (msg: Buffer) => {
-    parseString(msg, (err: Error|null, result: CanBeaconObj) =>{
+    parseString(msg, (err: Error | null, result: CanBeaconObj) => {
         let obj = new SocketPoint(
             result.CANBeacon.$.name.trim(),
             result.CANBeacon.URL[0].trim(),
@@ -62,7 +64,7 @@ baseSocket.on('message', (msg: Buffer) => {
         }
     });
 });
-//baseSocket.bind(42000);//todo remove
+
 function start() {
     baseSocket.bind(42000);
 }
@@ -76,23 +78,29 @@ function arrayEquals(a: Array<SocketPoint>, b: Array<SocketPoint>) {
         a.every((val, index) => val.equals(b[index]));
 }
 
-module.exports = emitter;
-module.exports.getEmitter = getEmitter;
-module.exports.Mode = Mode;
-module.exports.start = start;
-module.exports.getConnectionPoints = getConnectionPoints;
-module.exports.connect = connect;
-module.exports.disconnect = disconnect;
-module.exports.channelMode = channelMode;
-module.exports.addFrame = addFrame;
-module.exports.updateFrame = updateFrame;
-module.exports.deleteFrame = deleteFrame;
-module.exports.sendFrame = sendFrame;
-module.exports.filter = filter;
-module.exports.subscribe = subscribe;
-module.exports.unsubscribe = unsubscribe;
-module.exports.echo = echo;
-module.exports.isotpConfig = isotpConfig;
-module.exports.sendPdu = sendPdu;
+export default getEmitter;
+
+export {
+    Mode,
+    ConnectionMode,
+    BusName,
+    CustomSocket,
+    SocketPoint,
+    start,
+    getConnectionPoints,
+    connect,
+    disconnect,
+    channelMode,
+    addFrame,
+    updateFrame,
+    deleteFrame,
+    sendFrame,
+    filter,
+    subscribe,
+    unsubscribe,
+    echo,
+    isotpConfig,
+    sendPdu
+};
 
 

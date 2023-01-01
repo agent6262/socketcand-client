@@ -1,8 +1,6 @@
 import net from "net";
 import {Mode} from "../types/Mode";
-import {channelMode} from "../util/Util";
-import {EventEmitter} from "events";
-const scd = require("../socketcand")
+import scd from "../index";
 export class CustomSocket extends net.Socket {
     id?: string;
     url?: string;
@@ -18,7 +16,7 @@ export class CustomSocket extends net.Socket {
     }
 
     onDataRaw(rawData: Buffer) {
-        scd.getEmitter().emit('data', rawData.toString());
+        scd().emit('data', rawData.toString());
     }
 
     onDataControl(rawData: Buffer) {
@@ -39,7 +37,7 @@ export class CustomSocket extends net.Socket {
             if (data === '< hi >') {
                 this.write('< open ' + this.bus + ' >');
                 this.state = Mode.BCM;
-                scd.getEmitter().emit('connected', {url: this.url, id: this.id});
+                scd().emit('connected', {url: this.url, id: this.id});
             } else if (data === "< ok >") {
             } else if (data.startsWith("< frame")) {
                 const dataArray = data.split(" ");
@@ -55,7 +53,7 @@ export class CustomSocket extends net.Socket {
                         sockId: this.id,
                         mode: this.state
                     };
-                    scd.getEmitter().emit('frame', frame)
+                    scd().emit('frame', frame)
                 } else {
                     return new Error("Error could not parse received frame, protocol inconsistency");
                 }
@@ -66,6 +64,6 @@ export class CustomSocket extends net.Socket {
     }
 
     onClose() {
-        scd.getEmitter().emit('disconnected', {url: this.url, id: this.id});
+        scd().emit('disconnected', {url: this.url, id: this.id});
     }
 }
