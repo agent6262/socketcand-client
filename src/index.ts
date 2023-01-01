@@ -60,7 +60,7 @@ baseSocket.on('message', (msg: Buffer) => {
 
         if (!arrayEquals(baseSocketPoints, lastBaseSocketPoints)) {
             lastBaseSocketPoints = [...baseSocketPoints];
-            module.exports.emit('connectionPoints', baseSocketPoints);
+            getEmitter().emit('connectionPoints', baseSocketPoints);
         }
     });
 });

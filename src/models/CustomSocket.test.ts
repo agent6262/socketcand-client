@@ -1,7 +1,7 @@
-const scd = require("../index");
 import {CustomSocket} from "./CustomSocket";
 import {Mode} from "../types/Mode";
 import nanoid from "nanoid";
+import getEmitter from "../index";
 
 describe("CustomSocket", () => {
     describe("onClose", () => {
@@ -15,7 +15,7 @@ describe("CustomSocket", () => {
         it("should emit object on 'disconnected' when socket is closed.", () => {
             let fnMock = jest.fn().mockImplementation();
             let obj = {url: customSocket.url, id: customSocket.id};
-            scd.getEmitter().on('disconnected', fnMock);
+            getEmitter().on('disconnected', fnMock);
 
             customSocket.onClose();
 
@@ -34,7 +34,7 @@ describe("CustomSocket", () => {
             let fnMock = jest.fn().mockImplementation();
             let strData = "< frame 123 23.424242 11 22 33 44 >";
             let buffer = Buffer.from(strData, 'utf-8');
-            scd.getEmitter().on('data', fnMock);
+            getEmitter().on('data', fnMock);
 
             customSocket.onDataRaw(buffer)
 
@@ -58,7 +58,7 @@ describe("CustomSocket", () => {
             });
             let fnMock = jest.fn().mockImplementation();
             let buffer = Buffer.from("< hi >", 'utf-8');
-            scd.getEmitter().on('connected', fnMock);
+            getEmitter().on('connected', fnMock);
 
             customSocketTest.onDataControl(buffer);
 
@@ -80,7 +80,7 @@ describe("CustomSocket", () => {
             const customSocketTest = new CustomSocket(undefined, nanoid.nanoid(8), "can://127.0.0.1:29536", Mode.RAW, "can0");
             let fnMock = jest.fn().mockImplementation();
             let buffer = Buffer.from("< frame 123 23.424242 11 22 33 44 >", 'utf-8');
-            scd.getEmitter().on('frame', fnMock);
+            getEmitter().on('frame', fnMock);
 
             let result = customSocketTest.onDataControl(buffer);
 
