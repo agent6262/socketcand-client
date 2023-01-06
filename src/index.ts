@@ -2,7 +2,7 @@ import {SocketPoint} from "./models/SocketPoint";
 import {BusName} from "./models/BusName";
 import {CanBeaconObj} from "./types/CANBeacon";
 import {Mode} from "./types/Mode";
-import {broadcastNewClient, channelMode, connect, disconnect, echo, findIndexCallback} from "./util/Util";
+import {broadcastNewClient, channelMode, connect, disconnect, echo, findIndexCallback, getConnectionFromUrl} from "./util/Util";
 import * as dgram from "dgram";
 import {EventEmitter} from "events";
 import {parseString} from "xml2js";
@@ -22,10 +22,14 @@ let lastBaseSocketPoints = new Array<SocketPoint>();
 const baseSocket = dgram.createSocket('udp4');
 setInterval(() => {
     baseSocketPoints
-        .filter(value => value.time < (Date.now() - 3000))
+        .filter(value => value.time < (Date.now() - 4000))
         .map((value, index) => index)
-        .forEach(value => baseSocketPoints.splice(value, 1))
-}, 3000);
+        .forEach(value => baseSocketPoints.splice(value, 1));
+    if (!arrayEquals(baseSocketPoints, lastBaseSocketPoints)) {
+        lastBaseSocketPoints = [...baseSocketPoints];
+        getEmitter().emit('connectionPoints', baseSocketPoints);
+    }
+}, 4000);
 baseSocket.on('listening', () => {
     let address = baseSocket.address();
     console.log(`socketcand-client listening ${address.address}:${address.port}`);
@@ -88,6 +92,8 @@ export {
     SocketPoint,
     start,
     getConnectionPoints,
+    getConnectionFromUrl,
+    findIndexCallback,
     connect,
     disconnect,
     channelMode,

@@ -12,6 +12,10 @@ export function getConnectionFromId(sockId: string) {
     return activeConnections.find(connection => connection.id === sockId);
 }
 
+export function getConnectionFromUrl(urlString: string) {
+    return activeConnections.find(connection => connection.url === urlString);
+}
+
 export function connect(urlString: string, connectionMode: ConnectionMode = ConnectionMode.CONTROLLED) {
     const parsedUrl = url.parse(urlString, true, true);
     const protocol = parsedUrl.protocol ?? "";
@@ -24,10 +28,11 @@ export function connect(urlString: string, connectionMode: ConnectionMode = Conn
 
 
     let scc = net.connect(+port, hostname);
+    let id = nanoid.nanoid(8);
     let customSocket = Object.assign(
         new CustomSocket(
             undefined,
-            nanoid.nanoid(8),
+            id,
             urlString,
             undefined,
             bus
@@ -36,12 +41,13 @@ export function connect(urlString: string, connectionMode: ConnectionMode = Conn
     );
     activeConnections.push(customSocket);
 
-    customSocket.on('data',
-        (connectionMode === ConnectionMode.RAW ? customSocket.onDataRaw : customSocket.onDataControl).bind(customSocket)
-    );
-    customSocket.on('close', customSocket.onClose.bind(customSocket));
+    scc.on('data', (connectionMode === ConnectionMode.RAW ? customSocket.onDataRaw : customSocket.onDataControl).bind(customSocket));
+    scc.on('close', customSocket.onClose.bind(customSocket));
+    scc.on('end', (() => {
+        disconnect(customSocket.id ?? "");
+    }));
 
-    return customSocket.id;
+    return id;
 }
 
 export function disconnect(sockId: string) {
