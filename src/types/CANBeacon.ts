@@ -14,7 +14,7 @@ export interface CANBeaconData {
 
 export interface CANBeacon {
     $: CANBeaconData;
-    URL: Array<String>;
+    URL: Array<string>;
     Bus: Array<CANBeaconBus>;
 }
 

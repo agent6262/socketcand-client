@@ -1,8 +1,17 @@
 import {SocketPoint} from "./models/SocketPoint";
 import {BusName} from "./models/BusName";
 import {CanBeaconObj} from "./types/CANBeacon";
-import {Mode} from "./types/Mode";
-import {broadcastNewClient, channelMode, connect, disconnect, echo, findIndexCallback, getConnectionFromUrl} from "./util/Util";
+import {Mode, modeFromString, modeToString} from "./types/Mode";
+import {
+    broadcastNewClient,
+    channelMode,
+    connect,
+    disconnect,
+    echo,
+    findIndexCallback,
+    getConnectionFromId,
+    getConnectionFromUrl
+} from "./util/Util";
 import * as dgram from "dgram";
 import {EventEmitter} from "events";
 import {parseString} from "xml2js";
@@ -10,6 +19,8 @@ import {isotpConfig, sendPdu} from "./util/ISOTP";
 import {addFrame, deleteFrame, filter, sendFrame, subscribe, unsubscribe, updateFrame} from "./util/BCM";
 import {ConnectionMode} from "./types/ConnectionMode";
 import {CustomSocket} from "./models/CustomSocket";
+import {ConnectionObj} from "./models/ConnectionObj";
+import {FrameObj} from "./models/FrameObj";
 
 const emitter = new EventEmitter();
 
@@ -31,7 +42,7 @@ setInterval(() => {
     }
 }, 4000);
 baseSocket.on('listening', () => {
-    let address = baseSocket.address();
+    const address = baseSocket.address();
     console.log(`socketcand-client listening ${address.address}:${address.port}`);
 });
 baseSocket.on('error', (err: Error) => {
@@ -41,7 +52,7 @@ baseSocket.on('error', (err: Error) => {
 });
 baseSocket.on('message', (msg: Buffer) => {
     parseString(msg, (err: Error | null, result: CanBeaconObj) => {
-        let obj = new SocketPoint(
+        const obj = new SocketPoint(
             result.CANBeacon.$.name.trim(),
             result.CANBeacon.URL[0].trim(),
             result.CANBeacon.Bus.map<BusName>(bus => {
@@ -90,10 +101,15 @@ export {
     BusName,
     CustomSocket,
     SocketPoint,
+    ConnectionObj,
+    FrameObj,
     start,
     getConnectionPoints,
     getConnectionFromUrl,
+    getConnectionFromId,
     findIndexCallback,
+    modeFromString,
+    modeToString,
     connect,
     disconnect,
     channelMode,

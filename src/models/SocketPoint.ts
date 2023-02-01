@@ -20,7 +20,7 @@ export class SocketPoint {
     }
 
     equals(sp: SocketPoint, callbackTrue?: () => void, callbackFalse?: () => void) {
-        let eq = this.host === sp.host && this.url === sp.url && this.busEqual(sp.buses);
+        const eq = this.host === sp.host && this.url === sp.url && this.busEqual(sp.buses);
 
         if(callbackTrue === undefined && callbackFalse === undefined) return eq;
         if (eq) callbackTrue?.();

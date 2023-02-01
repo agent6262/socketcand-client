@@ -25,7 +25,7 @@ export function isotpConfig(sockId: string,
         str += wftMax === undefined ? '' : ' ' + extAddr;
         str += wftMax === undefined ? '' : ' ' + rxExtAddr;
         str += ' >';
-        scc.write(str);
+        scc.socket.write(str);
     } else {
         return new Error('ERROR cannot change isotp config, wrong state');
     }
@@ -36,7 +36,7 @@ export function sendPdu(sockId: string, data: string) {
     if (scc == undefined) return new Error("Socket not found for id " + sockId);
 
     if (scc.state === Mode.ISOTP) {
-        scc.write('< sendpdu ' + data.split(" ").join("") + ' >');
+        scc.socket.write('< sendpdu ' + data.split(" ").join("") + ' >');
     } else {
         return new Error('ERROR cannot send pdu, wrong state');
     }

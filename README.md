@@ -4,23 +4,47 @@ An updated NodeJS client for socketcand daemon, based on zorce's socketcand-clie
 socketcand - https://github.com/linux-can/socketcand
 
 ## Example
-```nodejs
-const cand = require('./socketcand');
+```javascript
+import {
+    connect,
+    getEmitter,
+    SocketPoint,
+    start,
+    ConnectionObj,
+    FrameObj,
+} from "@agent6262/socketcand-client";
 
-cand.on('connected', function(conn) {
-	console.log("connected", conn);
-	cand.sendFrame(conn.id, '66', 4, 'DEADBEEF')
+function getUrlString(pointString: string) {
+    const atIndex = pointString.indexOf("@");
+    const openIndex = pointString.indexOf("(");
+    const closeIndex = pointString.indexOf(")");
+
+    return pointString.substring(openIndex + 1, closeIndex) + "/" + pointString.substring(0, atIndex);
+}
+
+getEmitter().on('connectionPoints', function (points: Array<SocketPoint>) {
+    console.log(points)
+    
+    let exampleStr = "can0@host (can://127.0.0.1:12345)"
+    let id = connect(exampleStr, ConnectionMode.CONTROLLED);
 });
 
-cand.on('disconnected', function() {
-	console.log("disconnected");
+getEmitter().on('frame', (frame: FrameObj) => {
+    console.log(frame)
 });
 
-cand.on('connectionPoints', function(points) {
-	console.log("connection point received", points);
-	let id = cand.connect(points[0].url+"/"+points[0].buses[0].name, cand.Mode.RAW);
-	console.log(id)
+getEmitter().on('connected', function (conn: ConnectionObj) {
+    
 });
 
-cand.start();
+getEmitter().on('disconnected', function (data: ConnectionObj) {
+    console.log("CLOSED")
+});
+
+getEmitter().on('data', function (data: any) {
+    console.log(data)
+});
+
+
+start();
 ```

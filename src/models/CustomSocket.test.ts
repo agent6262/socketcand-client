@@ -1,20 +1,23 @@
 import {CustomSocket} from "./CustomSocket";
 import {Mode} from "../types/Mode";
 import nanoid from "nanoid";
-import getEmitter from "../index";
+import getEmitter, {ConnectionMode, ConnectionObj, FrameObj} from "../index";
 
 describe("CustomSocket", () => {
     describe("onClose", () => {
         const customSocket = new CustomSocket(
-            undefined,
             nanoid.nanoid(8),
             "can://127.0.0.1:29536",
-            Mode.RAW
+            "29536",
+            "can://127.0.0.1",
+            undefined,
+            "can0",
+            ConnectionMode.RAW
         );
 
         it("should emit object on 'disconnected' when socket is closed.", () => {
-            let fnMock = jest.fn().mockImplementation();
-            let obj = {url: customSocket.url, id: customSocket.id};
+            const fnMock = jest.fn().mockImplementation();
+            const obj = new ConnectionObj(customSocket.url, customSocket.id);
             getEmitter().on('disconnected', fnMock);
 
             customSocket.onClose();
@@ -24,16 +27,19 @@ describe("CustomSocket", () => {
     });
     describe("onDataRaw", () => {
         const customSocket = new CustomSocket(
-            undefined,
             nanoid.nanoid(8),
             "can://127.0.0.1:29536",
-            Mode.RAW
+            "29536",
+            "can://127.0.0.1",
+            undefined,
+            "can0",
+            ConnectionMode.RAW
         );
 
         it("should emit string on 'data' when socket is in raw mode.", () => {
-            let fnMock = jest.fn().mockImplementation();
-            let strData = "< frame 123 23.424242 11 22 33 44 >";
-            let buffer = Buffer.from(strData, 'utf-8');
+            const fnMock = jest.fn().mockImplementation();
+            const strData = "< frame 123 23.424242 11 22 33 44 >";
+            const buffer = Buffer.from(strData, 'utf-8');
             getEmitter().on('data', fnMock);
 
             customSocket.onDataRaw(buffer)
@@ -42,75 +48,81 @@ describe("CustomSocket", () => {
         });
     });
     describe("onDataControl", () => {
-        it("should return error if id is not defined.", () => {
-            const customSocketTest = new CustomSocket(undefined, undefined, "can://127.0.0.1:29536", Mode.RAW, "can0");
-            let buffer = Buffer.from("< hi >", 'utf-8');
-
-            let result = customSocketTest.onDataControl(buffer);
-
-            expect(result).toStrictEqual(new Error("Invalid state, id not defined"));
-        });
+        const customSocket = new CustomSocket(
+            nanoid.nanoid(8),
+            "can://127.0.0.1:29536",
+            "29536",
+            "can://127.0.0.1",
+            undefined,
+            "can0",
+            ConnectionMode.RAW
+        );
 
         it("should emit obj on 'connected', set socket state, and send open command to socket.", () => {
-            const customSocketTest = new CustomSocket(undefined, nanoid.nanoid(8), "can://127.0.0.1:29536", Mode.RAW, "can0");
-            customSocketTest.write = jest.fn().mockImplementation((value: string) => {
+            const customSocketTest = new CustomSocket(
+                nanoid.nanoid(8),
+                "can://127.0.0.1:29536",
+                "29536",
+                "can://127.0.0.1",
+                undefined,
+                "can0",
+                ConnectionMode.RAW
+            );
+
+            customSocketTest.socket.write = jest.fn().mockImplementation((value: string) => {
                 return value
             });
-            let fnMock = jest.fn().mockImplementation();
-            let buffer = Buffer.from("< hi >", 'utf-8');
+            const fnMock = jest.fn().mockImplementation();
+            const buffer = Buffer.from("< hi >", 'utf-8');
             getEmitter().on('connected', fnMock);
 
             customSocketTest.onDataControl(buffer);
 
-            expect(customSocketTest.write).toHaveReturnedWith('< open can0 >');
+            expect(customSocketTest.socket.write).toHaveReturnedWith('< open can0 >');
             expect(customSocketTest.state).toBe(Mode.BCM);
-            expect(fnMock).toBeCalledWith({url: customSocketTest.url, id: customSocketTest.id});
+            expect(fnMock).toBeCalledWith(new ConnectionObj(customSocketTest.url, customSocketTest.id));
         });
 
         it("should do nothing if 'ok' frame.", () => {
-            const customSocketTest = new CustomSocket(undefined, nanoid.nanoid(8), "can://127.0.0.1:29536", Mode.RAW, "can0");
-            let buffer = Buffer.from("< ok >", 'utf-8');
+            const buffer = Buffer.from("< ok >", 'utf-8');
 
-            let result = customSocketTest.onDataControl(buffer);
+            const result = customSocket.onDataControl(buffer);
 
             expect(result).toBe(undefined);
         });
 
         it("should emit obj on 'frame'.", () => {
-            const customSocketTest = new CustomSocket(undefined, nanoid.nanoid(8), "can://127.0.0.1:29536", Mode.RAW, "can0");
-            let fnMock = jest.fn().mockImplementation();
-            let buffer = Buffer.from("< frame 123 23.424242 11 22 33 44 >", 'utf-8');
+            const fnMock = jest.fn().mockImplementation();
+            const buffer = Buffer.from("< frame 123 23.424242 11 22 33 44 >", 'utf-8');
             getEmitter().on('frame', fnMock);
 
-            let result = customSocketTest.onDataControl(buffer);
+            const result = customSocket.onDataControl(buffer);
 
             expect(result).toBe(undefined);
-            expect(fnMock).toBeCalledWith({
-                id: "123",
-                sec: "23",
-                usec: "424242",
-                data: "11 22 33 44",
-                bus: customSocketTest.bus,
-                url: customSocketTest.url,
-                sockId: customSocketTest.id,
-                mode: customSocketTest.state
-            });
+            expect(fnMock).toBeCalledWith(new FrameObj(
+                "123",
+                "23",
+                "424242",
+                "11 22 33 44",
+                customSocket.bus,
+                customSocket.url,
+                customSocket.id,
+                customSocket.state
+            ));
         });
 
         it("should return error if frame is not correct size.", () => {
-            const customSocketTest = new CustomSocket(undefined, nanoid.nanoid(8), "can://127.0.0.1:29536", Mode.RAW, "can0");
-            let buffer = Buffer.from("< frame 123 23.424242 >", 'utf-8');
+            const buffer = Buffer.from("< frame 123 23.424242 >", 'utf-8');
 
-            let result = customSocketTest.onDataControl(buffer);
+            const result = customSocket.onDataControl(buffer);
 
             expect(result).toStrictEqual(new Error("Error could not parse received frame, protocol inconsistency"));
         });
 
         it("should return error if frame is unknown.", () => {
-            const customSocketTest = new CustomSocket(undefined, nanoid.nanoid(8), "can://127.0.0.1:29536", Mode.RAW, "can0");
-            let buffer = Buffer.from("< hidden_test 1 6 8 1 3 5 6 >", 'utf-8');
+            const buffer = Buffer.from("< hidden_test 1 6 8 1 3 5 6 >", 'utf-8');
 
-            let result = customSocketTest.onDataControl(buffer);
+            const result = customSocket.onDataControl(buffer);
 
             expect(result).toStrictEqual(new Error("Error could not parse received frame, not implemented"));
         });

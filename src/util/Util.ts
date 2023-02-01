@@ -1,5 +1,4 @@
 import * as url from "url";
-import net from "net";
 import {CustomSocket} from "../models/CustomSocket";
 import nanoid from "nanoid";
 import {SocketPoint} from "../models/SocketPoint";
@@ -27,34 +26,27 @@ export function connect(urlString: string, connectionMode: ConnectionMode = Conn
     if (protocol !== "can:") return new Error("Wrong protocol in url only accept 'can:'");
 
 
-    let scc = net.connect(+port, hostname);
-    let id = nanoid.nanoid(8);
-    let customSocket = Object.assign(
-        new CustomSocket(
-            undefined,
-            id,
-            urlString,
-            undefined,
-            bus
-        ),
-        scc
-    );
+    const id = nanoid.nanoid(8);
+    const customSocket = new CustomSocket(
+        id,
+        urlString,
+        port,
+        hostname,
+        undefined,
+        bus,
+        connectionMode
+    )
     activeConnections.push(customSocket);
-
-    scc.on('data', (connectionMode === ConnectionMode.RAW ? customSocket.onDataRaw : customSocket.onDataControl).bind(customSocket));
-    scc.on('close', customSocket.onClose.bind(customSocket));
-    scc.on('end', (() => {
-        disconnect(customSocket.id ?? "");
-    }));
 
     return id;
 }
 
 export function disconnect(sockId: string) {
     findIndexCallback(activeConnections, socket => socket.id === sockId, index => {
-        activeConnections[index].destroy();
+        activeConnections[index].socket.destroy();
         activeConnections.splice(index, 1);
     }, () => {
+        return undefined;
     })
 }
 
@@ -64,13 +56,13 @@ export function channelMode(sockId: string, mode: number) {
     if (scc.state === undefined) return new Error('ERROR no open channel');
 
     if (mode === Mode.BCM && scc.state !== Mode.BCM) {
-        scc.write('< bcmmode >');
+        scc.socket.write('< bcmmode >');
         scc.state = Mode.BCM;
     } else if (mode === Mode.RAW && scc.state !== Mode.RAW) {
-        scc.write('< rawmode >');
+        scc.socket.write('< rawmode >');
         scc.state = Mode.RAW;
     } else if (mode === Mode.ISOTP && scc.state !== Mode.ISOTP) {
-        scc.write('< isotpmode >');
+        scc.socket.write('< isotpmode >');
         scc.state = Mode.ISOTP;
     }
 }
@@ -80,7 +72,7 @@ export function echo(sockId: string) {
     if (scc === undefined) return new Error("Socket not found for id " + sockId);
 
     if (scc.state !== undefined) {
-        scc.write('< echo >');
+        scc.socket.write('< echo >');
     } else {
         return new Error('ERROR no open channel');
     }
@@ -90,8 +82,8 @@ export function findIndexCallback<T>(
     array: Array<T>, predicate: (value: T, index: number, obj: T[]) => unknown,
     foundFn: (index: number) => void,
     notFoundFn: () => void,
-    thisArg?: any) {
-    let index = array.findIndex(predicate, thisArg);
+    thisArg?: never) {
+    const index = array.findIndex(predicate, thisArg);
     if (index > -1) foundFn(index);
     else notFoundFn();
 }
