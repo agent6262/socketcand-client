@@ -1,49 +1,51 @@
 {
-  "name": "@agent6262/socketcand-client",
-  "version": "2.0.4",
-  "description": "An updated nodejs client for socketcand daemon.",
-  "main": "build/index.js",
-  "types": "build/index.d.ts",
-  "scripts": {
-    "test": "jest",
-    "start:dev": "npx nodemon",
-    "build": "rimraf ./build && npm run lint && tsc",
-    "start": "npm run build && node build/socketcand.js",
-    "lint": "npx eslint ."
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/agent6262/socketcand-client.git"
-  },
-  "keywords": [
-    "NodeJS",
-    "socketcand"
-  ],
-  "author": "Dennis Delin",
-  "contributors": [
-    "Tyler Bucher"
-  ],
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/agent6262/socketcand-client/issues"
-  },
-  "homepage": "https://github.com/agent6262/socketcand-client#readme",
-  "dependencies": {
-    "nanoid": "^3.1.31",
-    "xml2js": "^0.4.23"
-  },
-  "devDependencies": {
-    "@types/jest": "^29.2.4",
-    "@types/node": "^18.11.18",
-    "@types/xml2js": "^0.4.11",
-    "@typescript-eslint/eslint-plugin": "^5.49.0",
-    "@typescript-eslint/parser": "^5.49.0",
-    "eslint": "^8.33.0",
-    "jest": "^29.3.1",
-    "nodemon": "^2.0.20",
-    "rimraf": "^3.0.2",
-    "ts-jest": "^29.0.3",
-    "ts-node": "^10.9.1",
-    "typescript": "^4.9.4"
-  }
+    "name": "@agent6262/socketcand-client",
+    "version": "2.0.4",
+    "description": "An updated nodejs client for socketcand daemon.",
+    "main": "build/index.js",
+    "types": "build/index.d.ts",
+    "scripts": {
+        "test": "jest",
+        "start:dev": "npx nodemon",
+        "build": "rimraf ./build && npm run lint && npm run format && tsc",
+        "start": "npm run build && node build/socketcand.js",
+        "lint": "npx eslint .",
+        "format": "prettier --write ."
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/agent6262/socketcand-client.git"
+    },
+    "keywords": [
+        "NodeJS",
+        "socketcand"
+    ],
+    "author": "Dennis Delin",
+    "contributors": [
+        "Tyler Bucher"
+    ],
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/agent6262/socketcand-client/issues"
+    },
+    "homepage": "https://github.com/agent6262/socketcand-client#readme",
+    "dependencies": {
+        "nanoid": "^3.1.31",
+        "xml2js": "^0.4.23"
+    },
+    "devDependencies": {
+        "@types/jest": "^29.2.4",
+        "@types/node": "^18.11.18",
+        "@types/xml2js": "^0.4.11",
+        "@typescript-eslint/eslint-plugin": "^5.49.0",
+        "@typescript-eslint/parser": "^5.49.0",
+        "eslint": "^8.33.0",
+        "jest": "^29.3.1",
+        "nodemon": "^2.0.20",
+        "prettier": "^2.8.4",
+        "rimraf": "^3.0.2",
+        "ts-jest": "^29.0.3",
+        "ts-node": "^10.9.1",
+        "typescript": "^4.9.4"
+    }
 }

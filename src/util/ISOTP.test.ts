@@ -18,7 +18,9 @@ describe("Util Functions", () => {
             "can0",
             ConnectionMode.CONTROLLED
         );
-        customSocket.socket.write = jest.fn().mockImplementation((value: string) => {return value});
+        customSocket.socket.write = jest.fn().mockImplementation((value: string) => {
+            return value;
+        });
 
         it("should return error when unable to find CustomSocket.", () => {
             const result = sendPdu(socketId, pduData);
@@ -41,7 +43,7 @@ describe("Util Functions", () => {
 
             const result = sendPdu(socketId, pduData);
             expect(result).toBe(undefined);
-            expect(customSocket.socket.write).toHaveReturnedWith("< sendpdu 5616516513215165145 >")
+            expect(customSocket.socket.write).toHaveReturnedWith("< sendpdu 5616516513215165145 >");
 
             disconnect(socketId);
         });
@@ -62,7 +64,9 @@ describe("Util Functions", () => {
             "can0",
             ConnectionMode.CONTROLLED
         );
-        customSocket.socket.write = jest.fn().mockImplementation((value: string) => {return value});
+        customSocket.socket.write = jest.fn().mockImplementation((value: string) => {
+            return value;
+        });
 
         it("should return error when unable to find CustomSocket.", () => {
             const result = isotpConfig(socketId, txId, rxId, flags, blockSize, stMin);
@@ -85,7 +89,7 @@ describe("Util Functions", () => {
 
             const result = isotpConfig(socketId, txId, rxId, flags, blockSize, stMin);
             expect(result).toBe(undefined);
-            expect(customSocket.socket.write).toHaveReturnedWith("< isotpconf 1F998877 1F998876 C 4 0 >")
+            expect(customSocket.socket.write).toHaveReturnedWith("< isotpconf 1F998877 1F998876 C 4 0 >");
 
             disconnect(socketId);
         });
@@ -95,7 +99,9 @@ describe("Util Functions", () => {
 
             const result = isotpConfig(socketId, txId, rxId, flags, blockSize, stMin, "0", "1", "2", "true", "true");
             expect(result).toBe(undefined);
-            expect(customSocket.socket.write).toHaveReturnedWith("< isotpconf 1F998877 1F998876 C 4 0 0 1 2 true true >")
+            expect(customSocket.socket.write).toHaveReturnedWith(
+                "< isotpconf 1F998877 1F998876 C 4 0 0 1 2 true true >"
+            );
 
             disconnect(socketId);
         });

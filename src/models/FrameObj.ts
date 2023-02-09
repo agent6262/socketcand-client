@@ -1,7 +1,6 @@
 import {Mode} from "../types/Mode";
 
 export class FrameObj {
-
     id: string;
     sec: string;
     usec: string;
@@ -11,7 +10,16 @@ export class FrameObj {
     sockId: string;
     mode: Mode | undefined;
 
-    constructor(id: string, sec: string, usec: string, data: string, bus: string | undefined, url: string | undefined, sockId: string, mode: Mode | undefined) {
+    constructor(
+        id: string,
+        sec: string,
+        usec: string,
+        data: string,
+        bus: string | undefined,
+        url: string | undefined,
+        sockId: string,
+        mode: Mode | undefined
+    ) {
         this.id = id;
         this.sec = sec;
         this.usec = usec;

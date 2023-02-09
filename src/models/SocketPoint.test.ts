@@ -39,12 +39,7 @@ describe("SocketPoint", () => {
         });
 
         it("should return true if buses are equal (size 0).", () => {
-            const socketPoint = new SocketPoint(
-                "fqdn_host_one",
-                "can://127.0.0.1:29536",
-                [],
-                Date.now()
-            );
+            const socketPoint = new SocketPoint("fqdn_host_one", "can://127.0.0.1:29536", [], Date.now());
 
             const newBuses = new Array<BusName>();
             const result = socketPoint.busEqual(newBuses);
@@ -72,7 +67,7 @@ describe("SocketPoint", () => {
 
         it("should return false if object host is not equal.", () => {
             const socketPointTest = clone(socketPoint);
-            socketPointTest.host = socketPoint.host + "new_data"
+            socketPointTest.host = socketPoint.host + "new_data";
 
             socketPoint.busEqual = jest.fn().mockReturnValue(true);
             const result = socketPoint.equals(socketPointTest);
@@ -82,7 +77,7 @@ describe("SocketPoint", () => {
 
         it("should return false if object url is not equal.", () => {
             const socketPointTest = clone(socketPoint);
-            socketPointTest.url = socketPoint.url + "new_data"
+            socketPointTest.url = socketPoint.url + "new_data";
 
             socketPoint.busEqual = jest.fn().mockReturnValue(true);
             const result = socketPoint.equals(socketPointTest);

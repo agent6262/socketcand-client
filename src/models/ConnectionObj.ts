@@ -1,5 +1,4 @@
 export class ConnectionObj {
-
     url: string | undefined;
     id: string | undefined;
 

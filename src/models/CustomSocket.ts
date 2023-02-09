@@ -13,7 +13,15 @@ export class CustomSocket {
     bus: string;
     socket: net.Socket;
 
-    constructor(id: string, url: string, port: string, hostname: string, state: Mode | undefined, bus: string, connectionMode: ConnectionMode) {
+    constructor(
+        id: string,
+        url: string,
+        port: string,
+        hostname: string,
+        state: Mode | undefined,
+        bus: string,
+        connectionMode: ConnectionMode
+    ) {
         this.id = id;
         this.url = url;
         this.port = port;
@@ -23,13 +31,16 @@ export class CustomSocket {
 
         this.socket = net.connect(+this.port, this.hostname);
 
-        this.socket.on('data', (connectionMode === ConnectionMode.RAW ? this.onDataRaw : this.onDataControl).bind(this));
-        this.socket.on('close', this.onClose.bind(this));
-        this.socket.on('end', this.onDisconnect.bind(this));
+        this.socket.on(
+            "data",
+            (connectionMode === ConnectionMode.RAW ? this.onDataRaw : this.onDataControl).bind(this)
+        );
+        this.socket.on("close", this.onClose.bind(this));
+        this.socket.on("end", this.onDisconnect.bind(this));
     }
 
     onDataRaw(rawData: Buffer) {
-        getEmitter().emit('data', rawData.toString());
+        getEmitter().emit("data", rawData.toString());
     }
 
     onDataControl(rawData: Buffer) {
@@ -37,19 +48,19 @@ export class CustomSocket {
         const dataList = new Array<string>();
         let index = 0;
         do {
-            const startIndex = dirtyData.indexOf('<', index);
-            const endIndex = dirtyData.indexOf('>', index);
+            const startIndex = dirtyData.indexOf("<", index);
+            const endIndex = dirtyData.indexOf(">", index);
             if (startIndex === -1 && endIndex === -1) break;
             dataList.push(dirtyData.substring(startIndex, endIndex + 1));
             index = endIndex + 1;
         } while (index > 0);
 
         for (const data of dataList) {
-            if (data === '< hi >') {
-                this.socket.write('< open ' + this.bus + ' >');
+            if (data === "< hi >") {
+                this.socket.write("< open " + this.bus + " >");
                 this.state = Mode.BCM;
-                getEmitter().emit('connected', new ConnectionObj(this.url, this.id));
-            } else if (data === '< ok >') {
+                getEmitter().emit("connected", new ConnectionObj(this.url, this.id));
+            } else if (data === "< ok >") {
                 continue;
             } else if (data.startsWith("< frame")) {
                 const dataArray = data.split(" ");
@@ -65,7 +76,7 @@ export class CustomSocket {
                         this.id,
                         this.state
                     );
-                    getEmitter().emit('frame', frame)
+                    getEmitter().emit("frame", frame);
                 } else {
                     return new Error("Error could not parse received frame, protocol inconsistency");
                 }
@@ -89,7 +100,7 @@ export class CustomSocket {
     }
 
     onClose() {
-        getEmitter().emit('disconnected', new ConnectionObj(this.url, this.id));
+        getEmitter().emit("disconnected", new ConnectionObj(this.url, this.id));
     }
 
     onDisconnect() {

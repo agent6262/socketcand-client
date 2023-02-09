@@ -18,7 +18,7 @@ describe("BCM", () => {
             ConnectionMode.CONTROLLED
         );
         customSocket.socket.write = jest.fn().mockImplementation((value: string) => {
-            return value
+            return value;
         });
 
         it("should return error when unable to find CustomSocket.", () => {
@@ -32,7 +32,7 @@ describe("BCM", () => {
             activeConnections.push(new CustomSocket(id, "", "", "", undefined, "", ConnectionMode.CONTROLLED));
 
             const result = unsubscribe(id, "123");
-            expect(result).toStrictEqual(new Error('ERROR cannot unsubscribe, wrong state'));
+            expect(result).toStrictEqual(new Error("ERROR cannot unsubscribe, wrong state"));
 
             disconnect(id);
         });
@@ -59,7 +59,7 @@ describe("BCM", () => {
             ConnectionMode.CONTROLLED
         );
         customSocket.socket.write = jest.fn().mockImplementation((value: string) => {
-            return value
+            return value;
         });
 
         it("should return error when unable to find CustomSocket.", () => {
@@ -73,7 +73,7 @@ describe("BCM", () => {
             activeConnections.push(new CustomSocket(id, "", "", "", undefined, "", ConnectionMode.CONTROLLED));
 
             const result = subscribe(id, "123", 123, 12345);
-            expect(result).toStrictEqual(new Error('ERROR cannot subscribe, wrong state'));
+            expect(result).toStrictEqual(new Error("ERROR cannot subscribe, wrong state"));
 
             disconnect(id);
         });
@@ -100,7 +100,7 @@ describe("BCM", () => {
             ConnectionMode.CONTROLLED
         );
         customSocket.socket.write = jest.fn().mockImplementation((value: string) => {
-            return value
+            return value;
         });
 
         it("should return error when unable to find CustomSocket.", () => {
@@ -114,7 +114,7 @@ describe("BCM", () => {
             activeConnections.push(new CustomSocket(id, "", "", "", undefined, "", ConnectionMode.CONTROLLED));
 
             const result = filter(id, "123", 123, 12345, 4, "FF");
-            expect(result).toStrictEqual(new Error('ERROR cannot filter, wrong state'));
+            expect(result).toStrictEqual(new Error("ERROR cannot filter, wrong state"));
 
             disconnect(id);
         });
@@ -141,7 +141,7 @@ describe("BCM", () => {
             ConnectionMode.CONTROLLED
         );
         customSocket.socket.write = jest.fn().mockImplementation((value: string) => {
-            return value
+            return value;
         });
 
         it("should return error when unable to find CustomSocket.", () => {
@@ -155,7 +155,7 @@ describe("BCM", () => {
             activeConnections.push(new CustomSocket(id, "", "", "", undefined, "", ConnectionMode.CONTROLLED));
 
             const result = sendFrame(id, "123", "4", "");
-            expect(result).toStrictEqual(new Error('ERROR cannot send frame, wrong state'));
+            expect(result).toStrictEqual(new Error("ERROR cannot send frame, wrong state"));
 
             disconnect(id);
         });
@@ -192,7 +192,7 @@ describe("BCM", () => {
             ConnectionMode.CONTROLLED
         );
         customSocket.socket.write = jest.fn().mockImplementation((value: string) => {
-            return value
+            return value;
         });
 
         it("should return error when unable to find CustomSocket.", () => {
@@ -206,7 +206,7 @@ describe("BCM", () => {
             activeConnections.push(new CustomSocket(id, "", "", "", undefined, "", ConnectionMode.CONTROLLED));
 
             const result = deleteFrame(id, "123");
-            expect(result).toStrictEqual(new Error('ERROR cannot delete frame, wrong state'));
+            expect(result).toStrictEqual(new Error("ERROR cannot delete frame, wrong state"));
 
             disconnect(id);
         });
@@ -233,7 +233,7 @@ describe("BCM", () => {
             ConnectionMode.CONTROLLED
         );
         customSocket.socket.write = jest.fn().mockImplementation((value: string) => {
-            return value
+            return value;
         });
 
         it("should return error when unable to find CustomSocket.", () => {
@@ -247,7 +247,7 @@ describe("BCM", () => {
             activeConnections.push(new CustomSocket(id, "", "", "", undefined, "", ConnectionMode.CONTROLLED));
 
             const result = updateFrame(id, "123", 4, "F1C6");
-            expect(result).toStrictEqual(new Error('ERROR cannot update frame, wrong state'));
+            expect(result).toStrictEqual(new Error("ERROR cannot update frame, wrong state"));
 
             disconnect(id);
         });
@@ -274,7 +274,7 @@ describe("BCM", () => {
             ConnectionMode.CONTROLLED
         );
         customSocket.socket.write = jest.fn().mockImplementation((value: string) => {
-            return value
+            return value;
         });
 
         it("should return error when unable to find CustomSocket.", () => {
@@ -288,7 +288,7 @@ describe("BCM", () => {
             activeConnections.push(new CustomSocket(id, "", "", "", undefined, "", ConnectionMode.CONTROLLED));
 
             const result = addFrame(id, "123", 12, 12345, 4, "F1C6");
-            expect(result).toStrictEqual(new Error('Cannot add frame, wrong state'));
+            expect(result).toStrictEqual(new Error("Cannot add frame, wrong state"));
 
             disconnect(id);
         });

@@ -30,52 +30,61 @@ export function getEmitter() {
 
 const baseSocketPoints = new Array<SocketPoint>();
 let lastBaseSocketPoints = new Array<SocketPoint>();
-const baseSocket = dgram.createSocket('udp4');
+const baseSocket = dgram.createSocket("udp4");
 setInterval(() => {
     baseSocketPoints
-        .filter(value => value.time < (Date.now() - 4000))
+        .filter((value) => value.time < Date.now() - 4000)
         .map((value, index) => index)
-        .forEach(value => baseSocketPoints.splice(value, 1));
+        .forEach((value) => baseSocketPoints.splice(value, 1));
     if (!arrayEquals(baseSocketPoints, lastBaseSocketPoints)) {
         lastBaseSocketPoints = [...baseSocketPoints];
-        getEmitter().emit('connectionPoints', baseSocketPoints);
+        getEmitter().emit("connectionPoints", baseSocketPoints);
     }
 }, 4000);
-baseSocket.on('listening', () => {
+baseSocket.on("listening", () => {
     const address = baseSocket.address();
     console.log(`socketcand-client listening ${address.address}:${address.port}`);
 });
-baseSocket.on('error', (err: Error) => {
+baseSocket.on("error", (err: Error) => {
     console.log(`Server error:\n${err.stack}`);
     baseSocket.close();
     return new Error("Server error:\n${err.stack}");
 });
-baseSocket.on('message', (msg: Buffer) => {
+baseSocket.on("message", (msg: Buffer) => {
     parseString(msg, (err: Error | null, result: CanBeaconObj) => {
         const obj = new SocketPoint(
             result.CANBeacon.$.name.trim(),
             result.CANBeacon.URL[0].trim(),
-            result.CANBeacon.Bus.map<BusName>(bus => {
+            result.CANBeacon.Bus.map<BusName>((bus) => {
                 return new BusName(bus.$.name.trim());
             }),
             Date.now()
         );
 
-        findIndexCallback(baseSocketPoints, x => x.host === obj.host, index => {
-            baseSocketPoints[index].equals(obj, () => {
-                baseSocketPoints[index] = obj;
-            }, () => {
-                baseSocketPoints[index] = obj;
-                broadcastNewClient(obj, true);
-            });
-        }, () => {
-            baseSocketPoints.push(obj);
-            broadcastNewClient(obj);
-        })
+        findIndexCallback(
+            baseSocketPoints,
+            (x) => x.host === obj.host,
+            (index) => {
+                baseSocketPoints[index].equals(
+                    obj,
+                    () => {
+                        baseSocketPoints[index] = obj;
+                    },
+                    () => {
+                        baseSocketPoints[index] = obj;
+                        broadcastNewClient(obj, true);
+                    }
+                );
+            },
+            () => {
+                baseSocketPoints.push(obj);
+                broadcastNewClient(obj);
+            }
+        );
 
         if (!arrayEquals(baseSocketPoints, lastBaseSocketPoints)) {
             lastBaseSocketPoints = [...baseSocketPoints];
-            getEmitter().emit('connectionPoints', baseSocketPoints);
+            getEmitter().emit("connectionPoints", baseSocketPoints);
         }
     });
 });
@@ -89,8 +98,7 @@ function getConnectionPoints() {
 }
 
 function arrayEquals(a: Array<SocketPoint>, b: Array<SocketPoint>) {
-    return a.length === b.length &&
-        a.every((val, index) => val.equals(b[index]));
+    return a.length === b.length && a.every((val, index) => val.equals(b[index]));
 }
 
 export default getEmitter;
@@ -124,5 +132,3 @@ export {
     isotpConfig,
     sendPdu
 };
-
-

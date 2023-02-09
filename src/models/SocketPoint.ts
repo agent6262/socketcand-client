@@ -16,13 +16,13 @@ export class SocketPoint {
     busEqual(bus: Array<BusName>) {
         if (this.buses.length !== bus.length) return false;
         if (this.buses.length === 0) return true;
-        return this.buses.every((val, index) => val.name === bus[index].name)
+        return this.buses.every((val, index) => val.name === bus[index].name);
     }
 
     equals(sp: SocketPoint, callbackTrue?: () => void, callbackFalse?: () => void) {
         const eq = this.host === sp.host && this.url === sp.url && this.busEqual(sp.buses);
 
-        if(callbackTrue === undefined && callbackFalse === undefined) return eq;
+        if (callbackTrue === undefined && callbackFalse === undefined) return eq;
         if (eq) callbackTrue?.();
         else callbackFalse?.();
     }
