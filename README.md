@@ -1,4 +1,8 @@
 # socketcand-client
+![GitHub build status](https://img.shields.io/github/actions/workflow/status/agent6262/socketcand-client/ci.yml?style=flat-square)
+![Codeclimate coverage](https://img.shields.io/codeclimate/coverage/agent6262/socketcand-client?style=flat-square)
+![npm downloads](https://img.shields.io/npm/dt/@agent6262/socketcand-client?style=flat-square)
+![github license](https://img.shields.io/github/license/agent6262/socketcand-client?style=flat-square)
 
 An updated NodeJS client for socketcand daemon, based on zorce's socketcand-client (https://github.com/zorce/socketcand-client).
 
