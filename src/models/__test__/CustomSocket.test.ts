@@ -1,20 +1,17 @@
-import {CustomSocket} from "./CustomSocket";
-import {Mode} from "../types/Mode";
-import nanoid from "nanoid";
-import getEmitter, {ConnectionMode, ConnectionObj, FrameObj} from "../index";
+import {Mode} from "../../types/Mode";
+import {CustomSocket} from "../CustomSocket";
+import {ConnectionObj} from "../ConnectionObj";
+import {FrameObj} from "../FrameObj";
+import getEmitter from "../../index";
+import {getCustomSocket} from "../../__test__/TestHelpers";
+
+let customSocket: CustomSocket;
+beforeEach(() => {
+    customSocket = getCustomSocket();
+});
 
 describe("CustomSocket", () => {
     describe("onClose", () => {
-        const customSocket = new CustomSocket(
-            nanoid.nanoid(8),
-            "can://127.0.0.1:29536",
-            "29536",
-            "can://127.0.0.1",
-            undefined,
-            "can0",
-            ConnectionMode.RAW
-        );
-
         it("should emit object on 'disconnected' when socket is closed.", () => {
             const fnMock = jest.fn().mockImplementation();
             const obj = new ConnectionObj(customSocket.url, customSocket.id);
@@ -26,16 +23,6 @@ describe("CustomSocket", () => {
         });
     });
     describe("onDataRaw", () => {
-        const customSocket = new CustomSocket(
-            nanoid.nanoid(8),
-            "can://127.0.0.1:29536",
-            "29536",
-            "can://127.0.0.1",
-            undefined,
-            "can0",
-            ConnectionMode.RAW
-        );
-
         it("should emit string on 'data' when socket is in raw mode.", () => {
             const fnMock = jest.fn().mockImplementation();
             const strData = "< frame 123 23.424242 11 22 33 44 >";
@@ -48,26 +35,8 @@ describe("CustomSocket", () => {
         });
     });
     describe("onDataControl", () => {
-        const customSocket = new CustomSocket(
-            nanoid.nanoid(8),
-            "can://127.0.0.1:29536",
-            "29536",
-            "can://127.0.0.1",
-            undefined,
-            "can0",
-            ConnectionMode.RAW
-        );
-
         it("should emit obj on 'connected', set socket state, and send open command to socket.", () => {
-            const customSocketTest = new CustomSocket(
-                nanoid.nanoid(8),
-                "can://127.0.0.1:29536",
-                "29536",
-                "can://127.0.0.1",
-                undefined,
-                "can0",
-                ConnectionMode.RAW
-            );
+            const customSocketTest = getCustomSocket();
 
             customSocketTest.socket.write = jest.fn().mockImplementation((value: string) => {
                 return value;
@@ -118,7 +87,9 @@ describe("CustomSocket", () => {
 
             const result = customSocket.onDataControl(buffer);
 
-            expect(result).toStrictEqual(new Error("Error could not parse received frame, protocol inconsistency"));
+            expect(result).toStrictEqual(
+                new Error("Error could not parse received frame, protocol inconsistency")
+            );
         });
 
         it("should return error if frame is unknown.", () => {

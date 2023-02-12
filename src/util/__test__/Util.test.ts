@@ -7,22 +7,21 @@ import {
     echo,
     findIndexCallback,
     getConnectionFromId
-} from "./Util";
-import {SocketPoint} from "../models/SocketPoint";
-import {CustomSocket} from "../models/CustomSocket";
-import {Mode} from "../types/Mode";
+} from "../Util";
+import {Mode} from "../../types/Mode";
 import nanoid from "nanoid";
-import {ConnectionMode} from "../types/ConnectionMode";
+import {ConnectionMode} from "../../types/ConnectionMode";
+import {
+    getCustomSocket,
+    getCustomSocketUndefined,
+    getSocketPoint,
+    mockNetConnect
+} from "../../__test__/TestHelpers";
 
 describe("Util Functions", () => {
     describe("broadcastNewClient", () => {
         let consoleLogSpy: jest.SpyInstance;
-        const socketPoint = new SocketPoint(
-            "fqdn_host_one",
-            "can://127.0.0.1:29536",
-            [{name: "can0"}, {name: "can1"}, {name: "can2"}],
-            Date.now()
-        );
+        const socketPoint = getSocketPoint();
 
         beforeAll(() => {
             consoleLogSpy = jest.spyOn(console, "log").mockImplementation();
@@ -34,12 +33,16 @@ describe("Util Functions", () => {
 
         it("should call console.log with new client if bool is missing.", () => {
             broadcastNewClient(socketPoint);
-            expect(consoleLogSpy).toBeCalledWith("New Client: can0,can1,can2@fqdn_host_one (can://127.0.0.1:29536)");
+            expect(consoleLogSpy).toBeCalledWith(
+                "New Client: can0,can1,can2@fqdn_host_one (can://127.0.0.1:29536)"
+            );
         });
 
         it("should call console.log with new client if bool is false.", () => {
             broadcastNewClient(socketPoint, false);
-            expect(consoleLogSpy).toBeCalledWith("New Client: can0,can1,can2@fqdn_host_one (can://127.0.0.1:29536)");
+            expect(consoleLogSpy).toBeCalledWith(
+                "New Client: can0,can1,can2@fqdn_host_one (can://127.0.0.1:29536)"
+            );
         });
 
         it("should call console.log with update client if bool is true.", () => {
@@ -53,10 +56,15 @@ describe("Util Functions", () => {
         const testArray = [5, 6, 8, 4, 3, 1, 7, 9, 2, 3];
         const predicateFn = (value: number) => value === 3;
         const predicateFnBad = (value: number) => value === 10;
+        const callbackFunctionTrue = jest.fn();
+        const callbackFunctionFalse = jest.fn();
+
+        beforeEach(() => {
+            callbackFunctionTrue.mockClear();
+            callbackFunctionFalse.mockClear();
+        });
 
         it("should call function if index is greater than -1.", () => {
-            const callbackFunctionTrue = jest.fn();
-            const callbackFunctionFalse = jest.fn();
             findIndexCallback(testArray, predicateFn, callbackFunctionTrue, callbackFunctionFalse);
 
             expect(callbackFunctionTrue).toBeCalled();
@@ -64,8 +72,6 @@ describe("Util Functions", () => {
         });
 
         it("should call function if index is -1.", () => {
-            const callbackFunctionTrue = jest.fn();
-            const callbackFunctionFalse = jest.fn();
             findIndexCallback(testArray, predicateFnBad, callbackFunctionTrue, callbackFunctionFalse);
 
             expect(callbackFunctionFalse).toBeCalled();
@@ -74,15 +80,7 @@ describe("Util Functions", () => {
     });
     describe("echo", () => {
         const socketId = nanoid.nanoid(8);
-        const customSocket = new CustomSocket(
-            socketId,
-            "can://127.0.0.1:29536",
-            "29536",
-            "can://127.0.0.1",
-            Mode.BCM,
-            "can0",
-            ConnectionMode.RAW
-        );
+        const customSocket = getCustomSocket(socketId, Mode.BCM, ConnectionMode.RAW);
         customSocket.socket.write = jest.fn().mockImplementation((value: string) => {
             return value;
         });
@@ -95,7 +93,7 @@ describe("Util Functions", () => {
 
         it("should return error when not in any state (undefined).", () => {
             const id = nanoid.nanoid(8);
-            activeConnections.push(new CustomSocket(id, "", "", "", undefined, "", ConnectionMode.RAW));
+            activeConnections.push(getCustomSocketUndefined(id, undefined, ConnectionMode.RAW));
 
             const result = echo(id);
             expect(result).toStrictEqual(new Error("ERROR no open channel"));
@@ -124,7 +122,7 @@ describe("Util Functions", () => {
 
         it("should return error when not in any state (undefined).", () => {
             const id = nanoid.nanoid(8);
-            activeConnections.push(new CustomSocket(id, "", "", "", undefined, "", ConnectionMode.RAW));
+            activeConnections.push(getCustomSocketUndefined(id, undefined, ConnectionMode.RAW));
 
             const result = channelMode(id, Mode.BCM);
             expect(result).toStrictEqual(new Error("ERROR no open channel"));
@@ -134,7 +132,7 @@ describe("Util Functions", () => {
 
         it("should write data to socket and change mode when not in requested mode (BCM).", () => {
             const id = nanoid.nanoid(8);
-            const customSocketTest = new CustomSocket(id, "", "", "", Mode.RAW, "", ConnectionMode.RAW);
+            const customSocketTest = getCustomSocketUndefined(id, Mode.RAW, ConnectionMode.RAW);
             customSocketTest.socket.write = jest.fn().mockImplementation((value: string) => {
                 return value;
             });
@@ -150,7 +148,7 @@ describe("Util Functions", () => {
 
         it("should write data to socket and change mode when not in requested mode (RAW).", () => {
             const id = nanoid.nanoid(8);
-            const customSocketTest = new CustomSocket(id, "", "", "", Mode.BCM, "", ConnectionMode.RAW);
+            const customSocketTest = getCustomSocketUndefined(id, Mode.BCM, ConnectionMode.RAW);
             customSocketTest.socket.write = jest.fn().mockImplementation((value: string) => {
                 return value;
             });
@@ -166,7 +164,7 @@ describe("Util Functions", () => {
 
         it("should write data to socket and change mode when not in requested mode (BCM).", () => {
             const id = nanoid.nanoid(8);
-            const customSocketTest = new CustomSocket(id, "", "", "", Mode.BCM, "", ConnectionMode.RAW);
+            const customSocketTest = getCustomSocketUndefined(id, Mode.BCM, ConnectionMode.RAW);
             customSocketTest.socket.write = jest.fn().mockImplementation((value: string) => {
                 return value;
             });
@@ -183,15 +181,7 @@ describe("Util Functions", () => {
     describe("disconnect", () => {
         it("should not contain the socket when removed.", () => {
             const id = nanoid.nanoid(8);
-            const customSocketTest = new CustomSocket(
-                id,
-                "can://127.0.0.1:29536",
-                "29536",
-                "can://127.0.0.1",
-                Mode.BCM,
-                "can0",
-                ConnectionMode.RAW
-            );
+            const customSocketTest = getCustomSocket(id, Mode.BCM, ConnectionMode.RAW);
             activeConnections.push(customSocketTest);
 
             expect(activeConnections).toContainEqual(customSocketTest);
@@ -201,27 +191,9 @@ describe("Util Functions", () => {
 
         it("should not change the array when the socket can not be found.", () => {
             const id = nanoid.nanoid(8);
-            const customSocketTest = new CustomSocket(
-                id,
-                "can://127.0.0.1:29536",
-                "29536",
-                "can://127.0.0.1",
-                Mode.BCM,
-                "can0",
-                ConnectionMode.RAW
-            );
+            const customSocketTest = getCustomSocket(id, Mode.BCM, ConnectionMode.RAW);
             customSocketTest.socket.destroy = jest.fn().mockImplementation();
-            activeConnections.push(
-                new CustomSocket(
-                    nanoid.nanoid(8),
-                    "can://127.0.0.1:29536",
-                    "29536",
-                    "can://127.0.0.1",
-                    Mode.BCM,
-                    "can0",
-                    ConnectionMode.RAW
-                )
-            );
+            activeConnections.push(getCustomSocket(nanoid.nanoid(8), Mode.BCM, ConnectionMode.RAW));
 
             expect(activeConnections).not.toContainEqual(customSocketTest);
             disconnect(id);
@@ -242,6 +214,7 @@ describe("Util Functions", () => {
         });
 
         it("should return socket id and store socket in array.", () => {
+            mockNetConnect();
             const bus = "can0";
             const url = "can://127.0.0.1:29536/" + bus;
             const result = connect(url);

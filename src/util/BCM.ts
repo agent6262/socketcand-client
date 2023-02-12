@@ -1,7 +1,14 @@
 import {Mode} from "../types/Mode";
 import {getConnectionFromId} from "./Util";
 
-export function addFrame(sockId: string, id: string, seconds: number, usec: number, dlc: number, data: string) {
+export function addFrame(
+    sockId: string,
+    id: string,
+    seconds: number,
+    usec: number,
+    dlc: number,
+    data: string
+) {
     const scc = getConnectionFromId(sockId);
     if (scc === undefined) return new Error("Socket not found for id " + sockId);
 

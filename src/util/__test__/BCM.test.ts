@@ -1,26 +1,23 @@
 import nanoid from "nanoid";
-import {CustomSocket} from "../models/CustomSocket";
-import {Mode} from "../types/Mode";
-import {activeConnections, disconnect} from "./Util";
-import {addFrame, deleteFrame, filter, sendFrame, subscribe, unsubscribe, updateFrame} from "./BCM";
-import {ConnectionMode} from "../types/ConnectionMode";
+import {Mode} from "../../types/Mode";
+import {activeConnections, disconnect} from "../Util";
+import {addFrame, deleteFrame, filter, sendFrame, subscribe, unsubscribe, updateFrame} from "../BCM";
+import {ConnectionMode} from "../../types/ConnectionMode";
+import {getCustomSocket, getCustomSocketUndefined} from "../../__test__/TestHelpers";
+import {CustomSocket} from "../../models/CustomSocket";
+
+let customSocket: CustomSocket;
+let socketId: string;
+beforeEach(() => {
+    socketId = nanoid.nanoid(8);
+    customSocket = getCustomSocket(socketId, Mode.BCM, ConnectionMode.CONTROLLED);
+    customSocket.socket.write = jest.fn().mockImplementation((value: string) => {
+        return value;
+    });
+});
 
 describe("BCM", () => {
     describe("unsubscribe", () => {
-        const socketId = nanoid.nanoid(8);
-        const customSocket = new CustomSocket(
-            socketId,
-            "can://127.0.0.1:29536",
-            "29536",
-            "can://127.0.0.1",
-            Mode.BCM,
-            "can0",
-            ConnectionMode.CONTROLLED
-        );
-        customSocket.socket.write = jest.fn().mockImplementation((value: string) => {
-            return value;
-        });
-
         it("should return error when unable to find CustomSocket.", () => {
             const result = unsubscribe(socketId, "123");
 
@@ -29,7 +26,7 @@ describe("BCM", () => {
 
         it("should return error when not in any state (undefined).", () => {
             const id = nanoid.nanoid(8);
-            activeConnections.push(new CustomSocket(id, "", "", "", undefined, "", ConnectionMode.CONTROLLED));
+            activeConnections.push(getCustomSocketUndefined(id, undefined, ConnectionMode.CONTROLLED));
 
             const result = unsubscribe(id, "123");
             expect(result).toStrictEqual(new Error("ERROR cannot unsubscribe, wrong state"));
@@ -48,20 +45,6 @@ describe("BCM", () => {
         });
     });
     describe("subscribe", () => {
-        const socketId = nanoid.nanoid(8);
-        const customSocket = new CustomSocket(
-            socketId,
-            "can://127.0.0.1:29536",
-            "29536",
-            "can://127.0.0.1",
-            Mode.BCM,
-            "can0",
-            ConnectionMode.CONTROLLED
-        );
-        customSocket.socket.write = jest.fn().mockImplementation((value: string) => {
-            return value;
-        });
-
         it("should return error when unable to find CustomSocket.", () => {
             const result = subscribe(socketId, "123", 123, 12345);
 
@@ -70,7 +53,7 @@ describe("BCM", () => {
 
         it("should return error when not in any state (undefined).", () => {
             const id = nanoid.nanoid(8);
-            activeConnections.push(new CustomSocket(id, "", "", "", undefined, "", ConnectionMode.CONTROLLED));
+            activeConnections.push(getCustomSocketUndefined(id, undefined, ConnectionMode.CONTROLLED));
 
             const result = subscribe(id, "123", 123, 12345);
             expect(result).toStrictEqual(new Error("ERROR cannot subscribe, wrong state"));
@@ -89,20 +72,6 @@ describe("BCM", () => {
         });
     });
     describe("filter", () => {
-        const socketId = nanoid.nanoid(8);
-        const customSocket = new CustomSocket(
-            socketId,
-            "can://127.0.0.1:29536",
-            "29536",
-            "can://127.0.0.1",
-            Mode.BCM,
-            "can0",
-            ConnectionMode.CONTROLLED
-        );
-        customSocket.socket.write = jest.fn().mockImplementation((value: string) => {
-            return value;
-        });
-
         it("should return error when unable to find CustomSocket.", () => {
             const result = filter(socketId, "123", 123, 12345, 4, "FF");
 
@@ -111,7 +80,7 @@ describe("BCM", () => {
 
         it("should return error when not in any state (undefined).", () => {
             const id = nanoid.nanoid(8);
-            activeConnections.push(new CustomSocket(id, "", "", "", undefined, "", ConnectionMode.CONTROLLED));
+            activeConnections.push(getCustomSocketUndefined(id, undefined, ConnectionMode.CONTROLLED));
 
             const result = filter(id, "123", 123, 12345, 4, "FF");
             expect(result).toStrictEqual(new Error("ERROR cannot filter, wrong state"));
@@ -130,20 +99,6 @@ describe("BCM", () => {
         });
     });
     describe("sendFrame", () => {
-        const socketId = nanoid.nanoid(8);
-        const customSocket = new CustomSocket(
-            socketId,
-            "can://127.0.0.1:29536",
-            "29536",
-            "can://127.0.0.1",
-            Mode.BCM,
-            "can0",
-            ConnectionMode.CONTROLLED
-        );
-        customSocket.socket.write = jest.fn().mockImplementation((value: string) => {
-            return value;
-        });
-
         it("should return error when unable to find CustomSocket.", () => {
             const result = sendFrame(socketId, "123", "4", "");
 
@@ -152,7 +107,7 @@ describe("BCM", () => {
 
         it("should return error when not in any state (undefined).", () => {
             const id = nanoid.nanoid(8);
-            activeConnections.push(new CustomSocket(id, "", "", "", undefined, "", ConnectionMode.CONTROLLED));
+            activeConnections.push(getCustomSocketUndefined(id, undefined, ConnectionMode.CONTROLLED));
 
             const result = sendFrame(id, "123", "4", "");
             expect(result).toStrictEqual(new Error("ERROR cannot send frame, wrong state"));
@@ -181,20 +136,6 @@ describe("BCM", () => {
         });
     });
     describe("deleteFrame", () => {
-        const socketId = nanoid.nanoid(8);
-        const customSocket = new CustomSocket(
-            socketId,
-            "can://127.0.0.1:29536",
-            "29536",
-            "can://127.0.0.1",
-            Mode.BCM,
-            "can0",
-            ConnectionMode.CONTROLLED
-        );
-        customSocket.socket.write = jest.fn().mockImplementation((value: string) => {
-            return value;
-        });
-
         it("should return error when unable to find CustomSocket.", () => {
             const result = deleteFrame(socketId, "123");
 
@@ -203,7 +144,7 @@ describe("BCM", () => {
 
         it("should return error when not in any state (undefined).", () => {
             const id = nanoid.nanoid(8);
-            activeConnections.push(new CustomSocket(id, "", "", "", undefined, "", ConnectionMode.CONTROLLED));
+            activeConnections.push(getCustomSocketUndefined(id, undefined, ConnectionMode.CONTROLLED));
 
             const result = deleteFrame(id, "123");
             expect(result).toStrictEqual(new Error("ERROR cannot delete frame, wrong state"));
@@ -222,20 +163,6 @@ describe("BCM", () => {
         });
     });
     describe("updateFrame", () => {
-        const socketId = nanoid.nanoid(8);
-        const customSocket = new CustomSocket(
-            socketId,
-            "can://127.0.0.1:29536",
-            "29536",
-            "can://127.0.0.1",
-            Mode.BCM,
-            "can0",
-            ConnectionMode.CONTROLLED
-        );
-        customSocket.socket.write = jest.fn().mockImplementation((value: string) => {
-            return value;
-        });
-
         it("should return error when unable to find CustomSocket.", () => {
             const result = updateFrame(socketId, "123", 4, "F1C6");
 
@@ -244,7 +171,7 @@ describe("BCM", () => {
 
         it("should return error when not in any state (undefined).", () => {
             const id = nanoid.nanoid(8);
-            activeConnections.push(new CustomSocket(id, "", "", "", undefined, "", ConnectionMode.CONTROLLED));
+            activeConnections.push(getCustomSocketUndefined(id, undefined, ConnectionMode.CONTROLLED));
 
             const result = updateFrame(id, "123", 4, "F1C6");
             expect(result).toStrictEqual(new Error("ERROR cannot update frame, wrong state"));
@@ -263,20 +190,6 @@ describe("BCM", () => {
         });
     });
     describe("addFrame", () => {
-        const socketId = nanoid.nanoid(8);
-        const customSocket = new CustomSocket(
-            socketId,
-            "can://127.0.0.1:29536",
-            "29536",
-            "can://127.0.0.1",
-            Mode.BCM,
-            "can0",
-            ConnectionMode.CONTROLLED
-        );
-        customSocket.socket.write = jest.fn().mockImplementation((value: string) => {
-            return value;
-        });
-
         it("should return error when unable to find CustomSocket.", () => {
             const result = addFrame(socketId, "123", 12, 12345, 4, "F1C6");
 
@@ -285,8 +198,7 @@ describe("BCM", () => {
 
         it("should return error when not in any state (undefined).", () => {
             const id = nanoid.nanoid(8);
-            activeConnections.push(new CustomSocket(id, "", "", "", undefined, "", ConnectionMode.CONTROLLED));
-
+            activeConnections.push(getCustomSocketUndefined(id, undefined, ConnectionMode.CONTROLLED));
             const result = addFrame(id, "123", 12, 12345, 4, "F1C6");
             expect(result).toStrictEqual(new Error("Cannot add frame, wrong state"));
 

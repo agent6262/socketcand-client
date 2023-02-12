@@ -5,7 +5,8 @@
     "main": "build/index.js",
     "types": "build/index.d.ts",
     "scripts": {
-        "test": "jest",
+        "test": "jest --coverage=false",
+        "coverage": "jest --collectCoverage",
         "start:dev": "npx nodemon",
         "build": "rimraf ./build && npm run lint && npm run format && tsc",
         "start": "npm run build && node build/socketcand.js",

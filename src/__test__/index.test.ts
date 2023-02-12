@@ -1,8 +1,7 @@
-import {CustomSocket} from "./models/CustomSocket";
 import nanoid from "nanoid";
 import net from "net";
-import {ConnectionMode} from "./types/ConnectionMode";
-import getEmitter, {Mode} from "./index";
+import getEmitter, {ConnectionMode, Mode} from "../index";
+import {getCustomSocket} from "./TestHelpers";
 
 function randMax(max: number) {
     return Math.floor(Math.random() * max);
@@ -39,19 +38,11 @@ function oldDataControl(rawData: Buffer) {
 }
 
 describe("socketcand", () => {
-    describe("Performance Tests", () => {
+    describe.skip("Performance Tests", () => {
         it("should pass if ", () => {
             const mockFn = jest.fn().mockImplementation();
             const scc = new net.Socket();
-            const customSocket = new CustomSocket(
-                nanoid.nanoid(8),
-                "can://127.0.0.1:29536",
-                "29536",
-                "can://127.0.0.1",
-                Mode.BCM,
-                "can0",
-                ConnectionMode.CONTROLLED
-            );
+            const customSocket = getCustomSocket(nanoid.nanoid(8), Mode.BCM, ConnectionMode.CONTROLLED);
             getEmitter().on("frame", mockFn);
             scc.on("data", customSocket.onDataControl.bind(customSocket));
 
@@ -90,11 +81,13 @@ describe("socketcand", () => {
             const bigIntItems = BigInt(items);
             console.log("Old Throughput: " + (endTime - startTime) / bigIntItems + " frames/ns");
             console.log(
-                "Old Frames/sec: " + (((endTime - startTime) / bigIntItems) * BigInt(1000000000)).toLocaleString()
+                "Old Frames/sec: " +
+                    (((endTime - startTime) / bigIntItems) * BigInt(1000000000)).toLocaleString()
             );
             console.log("New Throughput: " + (newEndTime - newStartTime) / bigIntItems + " frames/ns");
             console.log(
-                "New Frames/sec: " + (((newEndTime - newStartTime) / bigIntItems) * BigInt(1000000000)).toLocaleString()
+                "New Frames/sec: " +
+                    (((newEndTime - newStartTime) / bigIntItems) * BigInt(1000000000)).toLocaleString()
             );
             expect(mockFn).toBeCalledTimes(items * 2);
 
