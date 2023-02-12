@@ -4,9 +4,16 @@
 ![npm downloads](https://img.shields.io/npm/dt/@agent6262/socketcand-client?style=flat-square)
 ![github license](https://img.shields.io/github/license/agent6262/socketcand-client?style=flat-square)
 
-An updated NodeJS client for socketcand daemon, based on zorce's socketcand-client (https://github.com/zorce/socketcand-client).
+An updated NodeJS client for socketcand daemon, based on [zorce's socketcand-client](https://github.com/zorce/socketcand-client).
 
-socketcand - https://github.com/linux-can/socketcand
+## Usage
+
+Availible emitter enpoints are:
+* connectionPoints - Lists avalible connections options (Created from socketcand broadcasting packets).
+* data - Outputs raw frame data as recieved from a socektcand server (Only emits data when connected in raw mode).
+* frame - Outputs a parsed can frame obj from socketcand server(s) (Only emits data when connected in controlled mode).
+* connected - Ouputs a data object when this library connects to a socketcand server.
+* disconnected - Outputs a data object when this library disconnects from a socketcand server.
 
 ## Example
 
@@ -36,3 +43,7 @@ getEmitter().on("data", function (data: any) {
 
 start();
 ```
+
+# Refrences
+* [zorce/socketcand-client](https://github.com/zorce/socketcand-client)
+* [linux-can/socketcand](https://github.com/linux-can/socketcand)
