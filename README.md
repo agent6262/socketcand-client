@@ -1,4 +1,5 @@
 # socketcand-client
+
 ![GitHub build status](https://img.shields.io/github/actions/workflow/status/agent6262/socketcand-client/ci.yml?style=flat-square)
 ![Codeclimate coverage](https://img.shields.io/codeclimate/coverage/agent6262/socketcand-client?style=flat-square)
 ![npm version](https://img.shields.io/npm/v/@agent6262/socketcand-client?style=flat-square)
@@ -10,11 +11,12 @@ An updated NodeJS client for socketcand daemon, based on [zorce's socketcand-cli
 ## Usage
 
 Availible emitter enpoints are:
-* connectionPoints - Lists avalible connections options (Created from socketcand broadcasting packets).
-* data - Outputs raw frame data as recieved from a socektcand server (Only emits data when connected in raw mode).
-* frame - Outputs a parsed can frame obj from socketcand server(s) (Only emits data when connected in controlled mode).
-* connected - Ouputs a data object when this library connects to a socketcand server.
-* disconnected - Outputs a data object when this library disconnects from a socketcand server.
+
+-   connectionPoints - Lists avalible connections options (Created from socketcand broadcasting packets).
+-   data - Outputs raw frame data as recieved from a socektcand server (Only emits data when connected in raw mode).
+-   frame - Outputs a parsed can frame obj from socketcand server(s) (Only emits data when connected in controlled mode).
+-   connected - Ouputs a data object when this library connects to a socketcand server.
+-   disconnected - Outputs a data object when this library disconnects from a socketcand server.
 
 ## Example
 
@@ -32,9 +34,7 @@ getEmitter().on("frame", (frame: FrameObj) => {
     console.log(frame);
 });
 
-getEmitter().on("connected", function (conn: ConnectionObj) {
-    
-});
+getEmitter().on("connected", function (conn: ConnectionObj) {});
 
 getEmitter().on("disconnected", function (data: ConnectionObj) {
     console.log("CLOSED");
@@ -48,5 +48,6 @@ start();
 ```
 
 # Refrences
-* [zorce/socketcand-client](https://github.com/zorce/socketcand-client)
-* [linux-can/socketcand](https://github.com/linux-can/socketcand)
+
+-   [zorce/socketcand-client](https://github.com/zorce/socketcand-client)
+-   [linux-can/socketcand](https://github.com/linux-can/socketcand)
