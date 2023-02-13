@@ -1,6 +1,7 @@
 # socketcand-client
 ![GitHub build status](https://img.shields.io/github/actions/workflow/status/agent6262/socketcand-client/ci.yml?style=flat-square)
 ![Codeclimate coverage](https://img.shields.io/codeclimate/coverage/agent6262/socketcand-client?style=flat-square)
+![npm version](https://img.shields.io/npm/v/@agent6262/socketcand-client?style=flat-square)
 ![npm downloads](https://img.shields.io/npm/dt/@agent6262/socketcand-client?style=flat-square)
 ![github license](https://img.shields.io/github/license/agent6262/socketcand-client?style=flat-square)
 
@@ -17,7 +18,7 @@ Availible emitter enpoints are:
 
 ## Example
 
-```javascript
+```typescript
 import {connect, getEmitter, SocketPoint, start, ConnectionObj, FrameObj} from "@agent6262/socketcand-client";
 
 getEmitter().on("connectionPoints", function (points: Array<SocketPoint>) {
@@ -31,13 +32,15 @@ getEmitter().on("frame", (frame: FrameObj) => {
     console.log(frame);
 });
 
-getEmitter().on("connected", function (conn: ConnectionObj) {});
+getEmitter().on("connected", function (conn: ConnectionObj) {
+    
+});
 
 getEmitter().on("disconnected", function (data: ConnectionObj) {
     console.log("CLOSED");
 });
 
-getEmitter().on("data", function (data: any) {
+getEmitter().on("data", function (data: string) {
     console.log(data);
 });
 

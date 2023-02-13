@@ -33,6 +33,56 @@ const baseSocketPoints = new Array<SocketPoint>();
 let lastBaseSocketPoints = new Array<SocketPoint>();
 let baseSocket: dgram.Socket;
 
+function onListen() {
+    const address = baseSocket.address();
+    console.log(`socketcand-client listening ${address.address}:${address.port}`);
+}
+
+function onError(err: Error) {
+    console.log(`Server error:\n${err.stack}`);
+    baseSocket.close();
+    return new Error("Server error:\n${err.stack}");
+}
+
+function onMessage(msg: Buffer) {
+    parseString(msg, (err: Error | null, result: CanBeaconObj) => {
+        const obj = new SocketPoint(
+            result.CANBeacon.$.name.trim(),
+            result.CANBeacon.URL[0].trim(),
+            result.CANBeacon.Bus.map<BusName>((bus) => {
+                return new BusName(bus.$.name.trim());
+            }),
+            Date.now()
+        );
+
+        findIndexCallback(
+            baseSocketPoints,
+            (x) => x.host === obj.host,
+            (index) => {
+                baseSocketPoints[index].equals(
+                    obj,
+                    () => {
+                        baseSocketPoints[index] = obj;
+                    },
+                    () => {
+                        baseSocketPoints[index] = obj;
+                        broadcastNewClient(obj, true);
+                    }
+                );
+            },
+            () => {
+                baseSocketPoints.push(obj);
+                broadcastNewClient(obj);
+            }
+        );
+
+        if (!arrayEquals(baseSocketPoints, lastBaseSocketPoints)) {
+            lastBaseSocketPoints = [...baseSocketPoints];
+            getEmitter().emit("connectionPoints", baseSocketPoints);
+        }
+    });
+}
+
 function start() {
     dgram.createSocket("udp4");
 
@@ -47,54 +97,9 @@ function start() {
         }
     }, 4000);
 
-    baseSocket.on("listening", () => {
-        const address = baseSocket.address();
-        console.log(`socketcand-client listening ${address.address}:${address.port}`);
-    });
-    baseSocket.on("error", (err: Error) => {
-        console.log(`Server error:\n${err.stack}`);
-        baseSocket.close();
-        return new Error("Server error:\n${err.stack}");
-    });
-    baseSocket.on("message", (msg: Buffer) => {
-        parseString(msg, (err: Error | null, result: CanBeaconObj) => {
-            const obj = new SocketPoint(
-                result.CANBeacon.$.name.trim(),
-                result.CANBeacon.URL[0].trim(),
-                result.CANBeacon.Bus.map<BusName>((bus) => {
-                    return new BusName(bus.$.name.trim());
-                }),
-                Date.now()
-            );
-
-            findIndexCallback(
-                baseSocketPoints,
-                (x) => x.host === obj.host,
-                (index) => {
-                    baseSocketPoints[index].equals(
-                        obj,
-                        () => {
-                            baseSocketPoints[index] = obj;
-                        },
-                        () => {
-                            baseSocketPoints[index] = obj;
-                            broadcastNewClient(obj, true);
-                        }
-                    );
-                },
-                () => {
-                    baseSocketPoints.push(obj);
-                    broadcastNewClient(obj);
-                }
-            );
-
-            if (!arrayEquals(baseSocketPoints, lastBaseSocketPoints)) {
-                lastBaseSocketPoints = [...baseSocketPoints];
-                getEmitter().emit("connectionPoints", baseSocketPoints);
-            }
-        });
-    });
-
+    baseSocket.on("listening", onListen);
+    baseSocket.on("error", onError);
+    baseSocket.on("message", onMessage);
     baseSocket.bind(42000);
 }
 
