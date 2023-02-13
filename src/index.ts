@@ -84,7 +84,7 @@ function onMessage(msg: Buffer) {
 }
 
 function start() {
-    dgram.createSocket("udp4");
+    baseSocket = dgram.createSocket("udp4");
 
     timer = setInterval(() => {
         baseSocketPoints
